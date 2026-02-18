@@ -47,7 +47,13 @@ func (a *InboundController) startTask() {
 
 func (a *InboundController) getInbounds(c *gin.Context) {
 	user := session.GetLoginUser(c)
-	inbounds, err := a.inboundService.GetInbounds(user.Id)
+
+	var filter struct {
+		Port int `json:"port"`
+	}
+	c.ShouldBindJSON(&filter)
+
+	inbounds, err := a.inboundService.GetInbounds(user.Id, filter.Port)
 	if err != nil {
 		jsonMsg(c, "获取", err)
 		return

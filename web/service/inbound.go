@@ -14,10 +14,14 @@ import (
 type InboundService struct {
 }
 
-func (s *InboundService) GetInbounds(userId int) ([]*model.Inbound, error) {
+func (s *InboundService) GetInbounds(userId int, port int) ([]*model.Inbound, error) {
 	db := database.GetDB()
 	var inbounds []*model.Inbound
-	err := db.Model(model.Inbound{}).Where("user_id = ?", userId).Find(&inbounds).Error
+	query := db.Model(model.Inbound{}).Where("user_id = ?", userId)
+	if port > 0 {
+		query = query.Where("port = ?", port)
+	}
+	err := query.Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
