@@ -49,13 +49,13 @@ func (a *InboundController) getInbounds(c *gin.Context) {
 	user := session.GetLoginUser(c)
 
 	var filter struct {
-		Port int `json:"port"`
+		Ports []int `json:"ports"`
 	}
 	c.ShouldBindJSON(&filter)
 
-	inbounds, err := a.inboundService.GetInbounds(user.Id, filter.Port)
+	inbounds, err := a.inboundService.GetInbounds(user.Id, filter.Ports)
 	if err != nil {
-		jsonMsg(c, "获取", err)
+		jsonMsg(c, "get inbounds", err)
 		return
 	}
 	jsonObj(c, inbounds, nil)
@@ -65,7 +65,7 @@ func (a *InboundController) addInbound(c *gin.Context) {
 	inbound := &model.Inbound{}
 	err := c.ShouldBind(inbound)
 	if err != nil {
-		jsonMsg(c, "添加", err)
+		jsonMsg(c, "add inbound", err)
 		return
 	}
 	user := session.GetLoginUser(c)
@@ -73,7 +73,7 @@ func (a *InboundController) addInbound(c *gin.Context) {
 	inbound.Enable = true
 	inbound.Tag = fmt.Sprintf("inbound-%v", inbound.Port)
 	err = a.inboundService.AddInbound(inbound)
-	jsonMsg(c, "添加", err)
+	jsonMsg(c, "add inbound", err)
 	if err == nil {
 		a.xrayService.SetToNeedRestart()
 	}
@@ -82,11 +82,11 @@ func (a *InboundController) addInbound(c *gin.Context) {
 func (a *InboundController) delInbound(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		jsonMsg(c, "删除", err)
+		jsonMsg(c, "delete inbound", err)
 		return
 	}
 	err = a.inboundService.DelInbound(id)
-	jsonMsg(c, "删除", err)
+	jsonMsg(c, "delete inbound", err)
 	if err == nil {
 		a.xrayService.SetToNeedRestart()
 	}
@@ -95,7 +95,7 @@ func (a *InboundController) delInbound(c *gin.Context) {
 func (a *InboundController) updateInbound(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		jsonMsg(c, "修改", err)
+		jsonMsg(c, "update inbound", err)
 		return
 	}
 	inbound := &model.Inbound{
@@ -103,11 +103,11 @@ func (a *InboundController) updateInbound(c *gin.Context) {
 	}
 	err = c.ShouldBind(inbound)
 	if err != nil {
-		jsonMsg(c, "修改", err)
+		jsonMsg(c, "update inbound", err)
 		return
 	}
 	err = a.inboundService.UpdateInbound(inbound)
-	jsonMsg(c, "修改", err)
+	jsonMsg(c, "update inbound", err)
 	if err == nil {
 		a.xrayService.SetToNeedRestart()
 	}

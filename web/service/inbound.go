@@ -14,12 +14,12 @@ import (
 type InboundService struct {
 }
 
-func (s *InboundService) GetInbounds(userId int, port int) ([]*model.Inbound, error) {
+func (s *InboundService) GetInbounds(userId int, ports []int) ([]*model.Inbound, error) {
 	db := database.GetDB()
 	var inbounds []*model.Inbound
 	query := db.Model(model.Inbound{}).Where("user_id = ?", userId)
-	if port > 0 {
-		query = query.Where("port = ?", port)
+	if len(ports) > 0 {
+		query = query.Where("port IN (?)", ports)
 	}
 	err := query.Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -58,7 +58,7 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) error {
 		return err
 	}
 	if exist {
-		return common.NewError("端口已存在:", inbound.Port)
+		return common.NewError("port already exists:", inbound.Port)
 	}
 	db := database.GetDB()
 	return db.Save(inbound).Error
@@ -71,7 +71,7 @@ func (s *InboundService) AddInbounds(inbounds []*model.Inbound) error {
 			return err
 		}
 		if exist {
-			return common.NewError("端口已存在:", inbound.Port)
+			return common.NewError("port already exists:", inbound.Port)
 		}
 	}
 
@@ -117,7 +117,7 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) error {
 		return err
 	}
 	if exist {
-		return common.NewError("端口已存在:", inbound.Port)
+		return common.NewError("port already exists:", inbound.Port)
 	}
 
 	oldInbound, err := s.GetInbound(inbound.Id)
