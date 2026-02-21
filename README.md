@@ -1,3 +1,19 @@
+Create new release
+Download source code in foreign server
+CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o x-ui
+cp x-ui /var/www/bot/assets/
+
+In iran server
+wget https://bot.forgaming.ir/assets/x-ui
+mv x-ui /usr/local/x-ui/
+chmod +x x-ui bin/xray-linux-amd64
+sudo cp -f x-ui.service /etc/systemd/system/
+chmod +x /usr/local/x-ui/x-ui.sh
+sudo chmod +x /usr/bin/x-ui
+sudo systemctl daemon-reload
+sudo service x-ui restart
+
+
 # x-ui
 
 支持多协议多用户的 xray 面板
